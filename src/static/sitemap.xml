@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+    <!-- Ana Sayfa -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <!-- Hakkımızda -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/hakkimizda</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Ürünler Ana Sayfa -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Ürün Kategorileri -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/panjur-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/kepenk-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/pergola-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/bioclimatic-pergola</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/zip-perde-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/giyotin-cam-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/kis-bahcesi</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/otomatik-kapi-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/dis-cephe-jaluzileri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/urunler/havuz-kapama-cozumleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Projeler -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/projeler</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- E-Ticaret -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/e-ticaret</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Blog -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/blog</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- İletişim -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/iletisim</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Şehir Sayfaları -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/ankara-panjur-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/istanbul-kepenk-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/izmir-pergola-sistemleri</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Hizmet Sayfaları -->
+    <url>
+        <loc>https://www.tozyapi.com.tr/hizmetler/montaj</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/hizmetler/bakim-onarim</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://www.tozyapi.com.tr/hizmetler/proje-danismanligi</loc>
+        <lastmod>2025-07-18</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+</urlset>
+
