@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python
 __pycache__/
 *.py[cod]
@@ -57,3 +58,12 @@ chat_logs.json
 *.tmp
 *.temp
 
+=======
+node_modules/
+.env
+dist/
+build/
+*.log
+__pycache/
+*.pyc
+>>>>>>> c8466e4227d28bb6570bf8889c0fd9606d34b1be
