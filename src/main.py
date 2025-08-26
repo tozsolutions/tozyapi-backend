@@ -1,47 +1,54 @@
-import os
-import sys
-# DON'T CHANGE THIS !!!
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from flask import Flask, send_from_directory
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-from src.models.user import db
-from src.routes.user import user_bp
-from src.routes.luna_ai import luna_bp
+import openai
+import os
+from dotenv import load_dotenv
 
-app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
+load_dotenv()
 
-# CORS ayarları
+app = Flask(__name__)
 CORS(app)
 
-app.register_blueprint(user_bp, url_prefix='/api')
-app.register_blueprint(luna_bp, url_prefix='/api/luna')
+# OpenAI API yapılandırması (ESKI SDK)
+openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.api_base = os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
 
-# uncomment if you need to use database
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
-with app.app_context():
-    db.create_all()
+@app.route('/')
+def home():
+    return jsonify({"message": "TOZ Yapı Teknolojileri API", "status": "active"})
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    static_folder_path = app.static_folder
-    if static_folder_path is None:
-            return "Static folder not configured", 404
+@app.route('/api/luna/chat', methods=['POST'])
+def luna_chat():
+    try:
+        data = request.json
+        user_message = data.get('message', '')
+        
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Sen Toz Yapı Teknolojileri'nin AI asistanı Luna'sın. Yapı, inşaat, mimari ve teknoloji konularında yardımcı oluyorsun."},
+                {"role": "user", "content": user_message}
+            ]
+        )
+        
+        return jsonify({
+            "response": response.choices[0].message.content,
+            "status": "success"
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "status": "error"}), 500
 
-    if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
-        return send_from_directory(static_folder_path, path)
-    else:
-        index_path = os.path.join(static_folder_path, 'index.html')
-        if os.path.exists(index_path):
-            return send_from_directory(static_folder_path, 'index.html')
-        else:
-            return "index.html not found", 404
-
+@app.route('/api/luna/quick-responses', methods=['GET'])
+def quick_responses():
+    return jsonify({
+        "responses": [
+            "Toz Yapı hakkında bilgi almak istiyorum",
+            "Projelerinizi görmek istiyorum",
+            "İletişime geçmek istiyorum",
+            "Teknoloji çözümleriniz nelerdir?"
+        ]
+    })
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5001))
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
