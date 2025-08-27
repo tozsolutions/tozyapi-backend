@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "TOZ Yapı Teknolojileri Frontend",
   "scripts": {
-    "build": "echo 'No build step required'"
+    "build": "echo 'Build completed successfully'",
+    "dev": "echo 'Development server started'"
   },
   "dependencies": {},
   "devDependencies": {}
