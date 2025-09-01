@@ -1,15 +1,29 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
-import openai
 import os
 import json
+import logging
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 luna_bp = Blueprint('luna', __name__)
 
-# OpenAI API ayarları
-openai.api_key = os.getenv('OPENAI_API_KEY')
-openai.api_base = os.getenv('OPENAI_API_BASE')
+# Initialize OpenAI client only if API key is available
+client = None
+if os.getenv('OPENAI_API_KEY'):
+    try:
+        from openai import OpenAI
+        client = OpenAI(
+            api_key=os.getenv('OPENAI_API_KEY'),
+            base_url=os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
+        )
+    except ImportError:
+        logger.error("OpenAI package not installed")
+    except Exception as e:
+        logger.error(f"Failed to initialize OpenAI client: {e}")
+else:
+    logger.warning("OpenAI API key not configured")
 
 # Luna'nın kişiliği ve bilgi tabanı
 LUNA_SYSTEM_PROMPT = """
@@ -58,13 +72,28 @@ KONUŞMA TARZI:
 def chat():
     try:
         data = request.get_json()
-        user_message = data.get('message', '')
+        user_message = data.get('message', '') if data else ''
         
-        if not user_message:
+        if not user_message or len(user_message.strip()) == 0:
             return jsonify({'error': 'Mesaj boş olamaz'}), 400
         
-        # OpenAI API çağrısı
-        response = openai.ChatCompletion.create(
+        # Enhanced input validation
+        user_message = user_message.strip()
+        
+        # Validate message length
+        if len(user_message) > 1000:
+            return jsonify({'error': 'Mesaj çok uzun (maksimum 1000 karakter)'}), 400
+        
+        # Basic input sanitization
+        if any(char in user_message for char in ['<script>', '</script>', '<iframe>', '</iframe>']):
+            return jsonify({'error': 'Geçersiz karakter tespit edildi'}), 400
+        
+        # Validate API key and client
+        if not client:
+            return jsonify({'error': 'OpenAI API anahtarı yapılandırılmamış'}), 500
+        
+        # OpenAI API çağrısı (NEW SDK)
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": LUNA_SYSTEM_PROMPT},
@@ -85,7 +114,8 @@ def chat():
         })
         
     except Exception as e:
-        return jsonify({'error': f'Bir hata oluştu: {str(e)}'}), 500
+        logger.error(f"Luna chat error: {e}")
+        return jsonify({'error': 'Bir hata oluştu. Lütfen tekrar deneyin.'}), 500
 
 @luna_bp.route('/quick-responses', methods=['GET'])
 @cross_origin()
@@ -143,8 +173,13 @@ def log_chat(user_message, luna_response):
             'luna_response': luna_response
         }
         
-        # Basit dosya tabanlı log
-        log_file = '/home/ubuntu/tozyapi-backend/chat_logs.json'
+        # Configurable log file path
+        log_file = os.getenv('CHAT_LOGS_FILE', 'chat_logs.json')
+        max_logs = int(os.getenv('MAX_CHAT_LOGS', '1000'))
+        
+        # Ensure log file is in a writable directory
+        if not os.path.isabs(log_file):
+            log_file = os.path.join(os.getcwd(), log_file)
         
         if os.path.exists(log_file):
             with open(log_file, 'r', encoding='utf-8') as f:
@@ -154,13 +189,13 @@ def log_chat(user_message, luna_response):
         
         logs.append(log_entry)
         
-        # Son 1000 mesajı tut
-        if len(logs) > 1000:
-            logs = logs[-1000:]
+        # Keep only the latest N messages
+        if len(logs) > max_logs:
+            logs = logs[-max_logs:]
         
         with open(log_file, 'w', encoding='utf-8') as f:
             json.dump(logs, f, ensure_ascii=False, indent=2)
             
     except Exception as e:
-        print(f"Log kaydetme hatası: {e}")
+        logger.error(f"Log kaydetme hatası: {e}")
 
