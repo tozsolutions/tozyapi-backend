@@ -1,11 +1,33 @@
 {
-  "name": "tozyapi-frontend",
+  "name": "tozyapi-backend",
   "version": "1.0.0",
-  "description": "TOZ Yapı Teknolojileri Frontend",
+  "description": "TOZ Yapı Teknolojileri Backend API - Luna AI Assistant",
+  "main": "src/main.py",
   "scripts": {
-    "build": "echo 'Build completed successfully'",
-    "dev": "echo 'Development server started'"
+    "start": "cd src && python main.py",
+    "dev": "cd src && FLASK_DEBUG=True python main.py",
+    "prod": "cd src && gunicorn --bind 0.0.0.0:5000 main:app",
+    "docker-build": "docker build -t tozyapi-backend .",
+    "docker-run": "docker run -p 5000:5000 --env-file .env tozyapi-backend",
+    "test": "echo 'Tests will be added soon'"
+  },
+  "keywords": [
+    "flask",
+    "api",
+    "openai",
+    "chatbot",
+    "construction",
+    "toz-yapi"
+  ],
+  "author": "TOZ Yapı Teknolojileri",
+  "license": "PROPRIETARY",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tozsolutions/tozyapi-backend"
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "engines": {
+    "python": ">=3.12.0"
+  }
 }
