@@ -1,2 +1,2 @@
-web: python src/main.py
+web: gunicorn --chdir src --workers 2 --bind 0.0.0.0:$PORT main:app
 
