@@ -77,9 +77,16 @@ def chat():
         if not user_message or len(user_message.strip()) == 0:
             return jsonify({'error': 'Mesaj boş olamaz'}), 400
         
+        # Enhanced input validation
+        user_message = user_message.strip()
+        
         # Validate message length
         if len(user_message) > 1000:
             return jsonify({'error': 'Mesaj çok uzun (maksimum 1000 karakter)'}), 400
+        
+        # Basic input sanitization
+        if any(char in user_message for char in ['<script>', '</script>', '<iframe>', '</iframe>']):
+            return jsonify({'error': 'Geçersiz karakter tespit edildi'}), 400
         
         # Validate API key and client
         if not client:
@@ -108,7 +115,7 @@ def chat():
         
     except Exception as e:
         logger.error(f"Luna chat error: {e}")
-        return jsonify({'error': f'Bir hata oluştu: {str(e)}'}), 500
+        return jsonify({'error': 'Bir hata oluştu. Lütfen tekrar deneyin.'}), 500
 
 @luna_bp.route('/quick-responses', methods=['GET'])
 @cross_origin()

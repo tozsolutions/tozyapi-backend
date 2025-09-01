@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
 import logging
 from dotenv import load_dotenv
@@ -26,6 +28,19 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-pro
 
 # Configure CORS
 CORS(app, origins=['*'])  # In production, specify exact origins
+
+# Configure Rate Limiting
+rate_limiting_enabled = os.getenv('RATE_LIMITING_ENABLED', 'True').lower() == 'true'
+if rate_limiting_enabled:
+    limiter = Limiter(
+        key_func=get_remote_address,
+        app=app,
+        storage_uri=os.getenv('RATE_LIMIT_STORAGE_URL', 'memory://'),
+        default_limits=[os.getenv('RATE_LIMIT_DEFAULT', '100 per hour')]
+    )
+else:
+    limiter = None
+    logger.info("Rate limiting disabled")
 
 # Register blueprints
 app.register_blueprint(luna_bp, url_prefix='/api/luna')
@@ -82,12 +97,23 @@ def health_check():
 @app.route('/api/luna/chat', methods=['POST'])
 def luna_chat():
     """Legacy endpoint - redirects to new Luna blueprint"""
+    # Apply rate limiting if enabled
+    if limiter:
+        limiter.limit(os.getenv('RATE_LIMIT_CHAT', '20 per minute'))(lambda: None)()
+    
     try:
         data = request.json
         if not data or not data.get('message'):
             return jsonify({"error": "Message is required", "status": "error"}), 400
             
-        user_message = data.get('message', '')
+        user_message = data.get('message', '').strip()
+        
+        # Enhanced input validation
+        if len(user_message) == 0:
+            return jsonify({"error": "Message cannot be empty", "status": "error"}), 400
+        
+        if len(user_message) > 1000:
+            return jsonify({"error": "Message too long (max 1000 characters)", "status": "error"}), 400
         
         # Validate API key
         if not client:
@@ -109,7 +135,7 @@ def luna_chat():
         })
     except Exception as e:
         logger.error(f"Luna chat error: {e}")
-        return jsonify({"error": str(e), "status": "error"}), 500
+        return jsonify({"error": "Internal server error", "status": "error"}), 500
 
 @app.route('/api/luna/quick-responses', methods=['GET'])
 def quick_responses():
