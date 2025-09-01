@@ -1,15 +1,20 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
-import openai
+from openai import OpenAI
 import os
 import json
+import logging
 from datetime import datetime
+from pathlib import Path
 
 luna_bp = Blueprint('luna', __name__)
+logger = logging.getLogger(__name__)
 
-# OpenAI API ayarları
-openai.api_key = os.getenv('OPENAI_API_KEY')
-openai.api_base = os.getenv('OPENAI_API_BASE')
+# Initialize OpenAI client with modern SDK
+client = OpenAI(
+    api_key=os.getenv('OPENAI_API_KEY'),
+    base_url=os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
+)
 
 # Luna'nın kişiliği ve bilgi tabanı
 LUNA_SYSTEM_PROMPT = """
@@ -58,13 +63,21 @@ KONUŞMA TARZI:
 def chat():
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+            
         user_message = data.get('message', '')
         
-        if not user_message:
+        if not user_message.strip():
             return jsonify({'error': 'Mesaj boş olamaz'}), 400
         
-        # OpenAI API çağrısı
-        response = openai.ChatCompletion.create(
+        # Check if OpenAI API key is configured
+        if not os.getenv('OPENAI_API_KEY'):
+            logger.error("OpenAI API key not configured")
+            return jsonify({'error': 'API yapılandırması eksik'}), 500
+        
+        # OpenAI API call with modern SDK
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": LUNA_SYSTEM_PROMPT},
@@ -76,16 +89,22 @@ def chat():
         
         luna_response = response.choices[0].message.content.strip()
         
-        # Sohbet geçmişini kaydet (basit log)
+        # Log the chat interaction
         log_chat(user_message, luna_response)
         
         return jsonify({
             'response': luna_response,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now().isoformat(),
+            'status': 'success'
         })
         
     except Exception as e:
-        return jsonify({'error': f'Bir hata oluştu: {str(e)}'}), 500
+        logger.error(f"Chat endpoint error: {str(e)}")
+        return jsonify({
+            'error': 'Bir hata oluştu. Lütfen tekrar deneyin.',
+            'timestamp': datetime.now().isoformat(),
+            'status': 'error'
+        }), 500
 
 @luna_bp.route('/quick-responses', methods=['GET'])
 @cross_origin()
@@ -143,24 +162,32 @@ def log_chat(user_message, luna_response):
             'luna_response': luna_response
         }
         
-        # Basit dosya tabanlı log
-        log_file = '/home/ubuntu/tozyapi-backend/chat_logs.json'
+        # Use relative path from project root or temp directory
+        log_dir = Path(os.getenv('LOG_DIR', '/tmp'))
+        log_dir.mkdir(exist_ok=True)
+        log_file = log_dir / 'chat_logs.json'
         
-        if os.path.exists(log_file):
-            with open(log_file, 'r', encoding='utf-8') as f:
-                logs = json.load(f)
+        if log_file.exists():
+            try:
+                with open(log_file, 'r', encoding='utf-8') as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, IOError):
+                logs = []
         else:
             logs = []
         
         logs.append(log_entry)
         
-        # Son 1000 mesajı tut
+        # Keep only last 1000 messages to prevent file from growing too large
         if len(logs) > 1000:
             logs = logs[-1000:]
         
         with open(log_file, 'w', encoding='utf-8') as f:
             json.dump(logs, f, ensure_ascii=False, indent=2)
             
+        logger.info(f"Chat logged successfully to {log_file}")
+            
     except Exception as e:
-        print(f"Log kaydetme hatası: {e}")
+        logger.error(f"Log kaydetme hatası: {e}")
+        # Don't raise the exception to avoid breaking the chat functionality
 
