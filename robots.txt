@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tozyapi.com.tr/sitemap.xml
