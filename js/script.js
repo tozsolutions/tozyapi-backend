@@ -100,6 +100,9 @@ document.addEventListener('DOMContentLoaded', function() {
     loadPartnerCarousel();
     initLunaAI();
     initSmoothScrolling();
+    initMobileMenu();
+    initPerformanceOptimizations();
+    initContactForm();
 });
 
 // Ürün kartlarını yükleme
@@ -107,14 +110,31 @@ function loadProductCards() {
     const productGrid = document.querySelector('.product-grid');
     if (!productGrid) return;
 
-    productGroups.forEach(product => {
+    productGroups.forEach((product, index) => {
         const productCard = document.createElement('div');
         productCard.className = 'product-card';
+        
+        // Placeholder image with gradient based on index
+        const gradients = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+            'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+            'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
+        ];
+        
         productCard.innerHTML = `
-            <img src="${product.image}" alt="${product.title}">
+            <div class="product-image-placeholder" style="background: ${gradients[index % gradients.length]}; height: 200px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                ${product.title.charAt(0)}
+            </div>
             <div class="product-card-content">
                 <h3>${product.title}</h3>
                 <p>${product.description}</p>
+                <button class="product-btn">Detayları Gör</button>
             </div>
         `;
         productGrid.appendChild(productCard);
@@ -126,13 +146,18 @@ function loadProjectCarousel() {
     const projectCarousel = document.querySelector('.project-carousel');
     if (!projectCarousel) return;
 
-    referenceProjects.forEach(project => {
+    referenceProjects.forEach((project, index) => {
         const projectItem = document.createElement('div');
         projectItem.className = 'project-item';
+        
+        // Generate placeholder with project name
+        const colors = ['#2c3e50', '#27ae60', '#e74c3c', '#3498db', '#9b59b6', '#f39c12'];
+        const bgColor = colors[index % colors.length];
+        
         projectItem.innerHTML = `
-            <img src="${project.image}" alt="${project.name}">
-            <div class="project-overlay">
-                <h4>${project.name}</h4>
+            <div class="project-placeholder" style="background: ${bgColor}; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🏢</div>
+                <h4 style="margin: 0; font-size: 1.2rem;">${project.name}</h4>
             </div>
         `;
         projectCarousel.appendChild(projectItem);
@@ -148,7 +173,9 @@ function loadPartnerCarousel() {
         const partnerItem = document.createElement('div');
         partnerItem.className = 'partner-item';
         partnerItem.innerHTML = `
-            <img src="${partner.logo}" alt="${partner.name}">
+            <div style="display: flex; align-items: center; justify-content: center; height: 80px; background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 10px; font-weight: bold; color: #2c3e50; text-align: center; padding: 10px;">
+                ${partner.name}
+            </div>
         `;
         partnerCarousel.appendChild(partnerItem);
     });
@@ -160,7 +187,7 @@ function initLunaAI() {
     const lunaToggle = document.createElement('div');
     lunaToggle.className = 'luna-toggle';
     lunaToggle.innerHTML = `
-        <img src="images/logos/LunaAI.jpg" alt="Luna AI">
+        <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">AI</div>
     `;
     document.body.appendChild(lunaToggle);
 
@@ -169,7 +196,7 @@ function initLunaAI() {
     lunaChat.className = 'luna-chat';
     lunaChat.innerHTML = `
         <div class="luna-header">
-            <img src="images/logos/LunaAI.jpg" alt="Luna" class="luna-avatar">
+            <div class="luna-avatar" style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">AI</div>
             <div>
                 <h4>Luna</h4>
                 <span>AI Asistan</span>
@@ -239,4 +266,143 @@ function startCarouselAutoScroll() {
 window.addEventListener('load', () => {
     setTimeout(startCarouselAutoScroll, 2000);
 });
+
+// Mobile menu functionality
+function initMobileMenu() {
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    const navMenu = document.querySelector('nav ul');
+    
+    if (mobileToggle && navMenu) {
+        mobileToggle.addEventListener('click', function() {
+            const isActive = this.classList.contains('active');
+            
+            this.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            this.setAttribute('aria-expanded', !isActive);
+        });
+        
+        // Close menu when clicking on a link
+        navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+                mobileToggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+    }
+}
+
+// Performance optimizations
+function initPerformanceOptimizations() {
+    // Lazy loading for images
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy');
+                    observer.unobserve(img);
+                }
+            });
+        });
+        
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+    
+    // Add loading animation
+    const loader = document.createElement('div');
+    loader.id = 'page-loader';
+    loader.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; color: white; font-size: 18px;">
+            <div style="text-align: center;">
+                <div style="width: 50px; height: 50px; border: 3px solid #27ae60; border-top: 3px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <div>Yükleniyor...</div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(loader);
+    
+    // Add spinner animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Remove loader when page is fully loaded
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            loader.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => loader.remove(), 500);
+        }, 1000);
+    });
+}
+
+// Error handling for missing images
+function handleImageError(img) {
+    img.style.display = 'none';
+    const placeholder = document.createElement('div');
+    placeholder.style.cssText = `
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 14px;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+    `;
+    placeholder.textContent = 'Görsel yükleniyor...';
+    img.parentNode.insertBefore(placeholder, img);
+}
+
+// Add contact form functionality
+function initContactForm() {
+    const contactSection = document.createElement('section');
+    contactSection.id = 'iletisim';
+    contactSection.innerHTML = `
+        <div class="container">
+            <h2>İletişim</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px;">
+                <div>
+                    <h3>Bize Ulaşın</h3>
+                    <form id="contact-form" style="display: flex; flex-direction: column; gap: 15px;">
+                        <input type="text" placeholder="Adınız Soyadınız" required style="padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+                        <input type="email" placeholder="E-posta Adresiniz" required style="padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+                        <input type="tel" placeholder="Telefon Numaranız" style="padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+                        <textarea placeholder="Mesajınız" rows="5" required style="padding: 12px; border: 1px solid #ddd; border-radius: 5px; resize: vertical;"></textarea>
+                        <button type="submit" style="background: #27ae60; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: 500;">Gönder</button>
+                    </form>
+                </div>
+                <div>
+                    <h3>İletişim Bilgileri</h3>
+                    <div style="line-height: 2;">
+                        <p><strong>📍 Adres:</strong><br>Üniversiteler Mah. 1597. Cad Bilkent Center AVM No:3 Bilkent Çankaya ANKARA</p>
+                        <p><strong>📞 Telefon:</strong> +90 536 773 14 04</p>
+                        <p><strong>📧 E-posta:</strong> merhaba@tozyapi.com.tr</p>
+                        <p><strong>🕒 Çalışma Saatleri:</strong><br>Pazartesi - Cuma: 09:00 - 18:00<br>Cumartesi: 09:00 - 16:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    contactSection.style.cssText = 'padding: 100px 0; background: #f8f9fa;';
+    document.querySelector('footer').before(contactSection);
+    
+    // Handle form submission
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Mesajınız alındı! En kısa sürede size dönüş yapacağız.');
+        this.reset();
+    });
+}
 
